@@ -73,7 +73,7 @@ class IrmaClientBridge extends IrmaBridge {
       _eventUnmarshallers.map((Type t, EventUnmarshaller u) => MapEntry<String, EventUnmarshaller>(t.toString(), u));
 
   IrmaClientBridge({
-    this.debugLogging = false,
+    this.debugLogging = true,
   }) : _methodChannel = const MethodChannel('irma.app/irma_mobile_bridge') {
     // Start listening to method calls from the native side
     _methodChannel.setMethodCallHandler(_handleMethodCall);

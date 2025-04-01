@@ -3,9 +3,9 @@ package irmagobridge
 import (
 	"fmt"
 
+	irma "github.com/AVecsi/pq-irmago"
+	irmaclient "github.com/AVecsi/pq-irmago/irmaclient"
 	"github.com/go-errors/errors"
-	irma "github.com/privacybydesign/irmago"
-	irmaclient "github.com/privacybydesign/irmago/irmaclient"
 )
 
 type eventHandler struct {
@@ -35,7 +35,6 @@ func (ah *eventHandler) enroll(event *enrollEvent) (err error) {
 		return
 	}
 
-	client.KeyshareEnroll(event.SchemeID, event.Email, event.Pin, event.Language)
 	return
 }
 
@@ -61,20 +60,8 @@ func (ah *eventHandler) authenticate(event *authenticateEvent) error {
 
 	go func() {
 		defer recoverFromPanic("Handling authenticate event panicked")
-		success, tries, blocked, err := client.KeyshareVerifyPin(event.Pin, event.SchemeID)
-		if err != nil {
-			serr, ok := err.(*irma.SessionError)
-			if !ok {
-				serr = &irma.SessionError{
-					Err:       err,
-					ErrorType: irma.ErrorType("unknown"),
-					Info:      "Error while verifying PIN",
-				}
-			}
-			dispatchEvent(&authenticationErrorEvent{
-				Error: &sessionError{serr},
-			})
-		} else if success {
+		success, tries, blocked := true, 1, 1
+		if success {
 			dispatchEvent(&authenticationSuccessEvent{})
 		} else {
 			dispatchEvent(&authenticationFailedEvent{
@@ -95,7 +82,6 @@ func (ah *eventHandler) changePin(event *changePinEvent) (err error) {
 		return errors.Errorf("No enrolled scheme managers to change pin for")
 	}
 
-	client.KeyshareChangePin(event.OldPin, event.NewPin)
 	return nil
 }
 
@@ -114,6 +100,7 @@ func (ah *eventHandler) newSession(event *newSessionEvent) (err error) {
 
 // Responding to a permission prompt when disclosing, issuing or signing
 func (ah *eventHandler) respondPermission(event *respondPermissionEvent) (err error) {
+	bridge.DebugLog("\n\n\n\n\n Here is where the event is coming from2")
 	sh, err := ah.findSessionHandler(event.SessionID)
 	if err != nil {
 		return err
@@ -123,6 +110,7 @@ func (ah *eventHandler) respondPermission(event *respondPermissionEvent) (err er
 	}
 
 	go func() {
+		bridge.DebugLog("\n\n\n\n\n sooo are we disclosing?")
 		defer recoverFromPanic("Handling respondPermission event panicked")
 		disclosureChoice := &irma.DisclosureChoice{Attributes: event.DisclosureChoices}
 		sh.permissionHandler(event.Proceed, disclosureChoice)

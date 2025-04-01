@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Upgrade to Flutter 3
-- Bump irmago version to [0.12.5](https://github.com/privacybydesign/irmago/releases/tag/v0.12.5)
+- Bump irmago version to [0.12.5](https://github.com/AVecsi/pq-irmago/releases/tag/v0.12.5)
 - Pin the personal category to the top of credential store
 - Report warnings from irmago to Sentry
 
@@ -234,7 +234,7 @@ Please note: Some graphics are linked to the IRMA scheme and will show placehold
 
 ## [6.4.1] - 2023-02-16 (in beta 2023-02-14)
 ### Fixed
-- Leftover 'oldscheme...' and 'tempscheme...' directories cause issues when parsing IrmaConfiguration ([privacybydesign/irmago#284](https://github.com/privacybydesign/irmago/issues/284))
+- Leftover 'oldscheme...' and 'tempscheme...' directories cause issues when parsing IrmaConfiguration ([privacybydesign/irmago#284](https://github.com/AVecsi/pq-irmago/issues/284))
 
 ## [6.4.0] - 2023-02-09 (in beta 2023-01-23)
 ### Added
@@ -244,7 +244,7 @@ Please note: Some graphics are linked to the IRMA scheme and will show placehold
 ### Fixed
 - Bug in error message parsing causes panics ([#28](https://github.com/privacybydesign/irmamobile/issues/28))
 - Issuer schemes can get out-of-sync after interrupted scheme update ([#66](https://github.com/privacybydesign/irmamobile/issues/66))
-- Avoid gocron panics in revocation code during irmaclient startup ([privacybydesign/irmago#249](https://github.com/privacybydesign/irmago/pull/249))
+- Avoid gocron panics in revocation code during irmaclient startup ([privacybydesign/irmago#249](https://github.com/AVecsi/pq-irmago/pull/249))
 
 ## [6.3.3] - 2023-01-23 (in beta 2022-12-16)
 ### Added

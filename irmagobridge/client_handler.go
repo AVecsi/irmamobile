@@ -1,9 +1,9 @@
 package irmagobridge
 
 import (
+	irma "github.com/AVecsi/pq-irmago"
+	"github.com/AVecsi/pq-irmago/irmaclient"
 	"github.com/go-errors/errors"
-	irma "github.com/privacybydesign/irmago"
-	"github.com/privacybydesign/irmago/irmaclient"
 )
 
 // compile-time type-check ClientHandler to implement irmaclient.ClientHandler
@@ -29,6 +29,7 @@ func (ch *clientHandler) UpdateConfiguration(new *irma.IrmaIdentifierSet) {
 }
 
 func (ch *clientHandler) UpdateAttributes() {
+	bridge.DebugLog("\n\n\n\n\n Here is where the event is coming from")
 	dispatchCredentialsEvent()
 }
 

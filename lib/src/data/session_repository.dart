@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../models/attribute.dart';
@@ -29,6 +30,10 @@ class SessionRepository {
       // In case a new session is created, we create a new session state.
       SessionState? nextState;
       if (prevStates.containsKey(event.sessionID)) {
+        debugPrint('_eventHandler\n\n\n');
+        debugPrintStack(label: 'SessionRepository stack', stackTrace: StackTrace.current, maxFrames: 50);
+
+        debugPrint('SessionRepository stack2 \n\n\n ${StackTrace.current.toString()}');
         final prevState = prevStates[event.sessionID]!;
         nextState = _eventHandler(prevState, event);
       } else if (event is NewSessionEvent) {
@@ -116,6 +121,8 @@ class SessionRepository {
       // All discons must have an option to choose from. Otherwise the session can never be finished.
       final canBeFinished = event.disclosuresCandidates.every((discon) => discon.isNotEmpty);
 
+      debugPrint('RequestIssuancePermissionSessionEvent\n\n\n ${event.disclosuresCandidates.isEmpty}\n\n\n');
+
       return prevState.copyWith(
         status: event.disclosuresCandidates.isEmpty
             ? SessionStatus.requestIssuancePermission
@@ -134,12 +141,18 @@ class SessionRepository {
       );
     } else if (event is RequestVerificationPermissionSessionEvent) {
       try {
+        debugPrint('Validating candidates\n\n\n');
         _validateCandidates(event.disclosuresCandidates);
       } on SessionError catch (e) {
         return prevState.copyWith(status: SessionStatus.error, error: e);
       }
       // All discons must have an option to choose from. Otherwise the session can never be finished.
       final canBeFinished = event.disclosuresCandidates.every((discon) => discon.isNotEmpty);
+
+      debugPrint('Status\n\n\n ${canBeFinished}\n\n\n');
+
+      debugPrint(
+          'Instance of SessionState\n\n\n status: ${SessionStatus.requestDisclosurePermission}\n serverName: ${event.serverName}\n satisfiable: ${event.satisfiable}\n canBeFinished: ${canBeFinished}\n isSignatureSession: ${event.isSignatureSession}\n signedMessage: ${event.signedMessage}\n event.disclosuresCandidates: ${event.disclosuresCandidates}\n disclosuresCandidates: ${ConDisCon.fromRaw(event.disclosuresCandidates, (DisclosureCandidate dc) => dc)}\n\n\n');
 
       return prevState.copyWith(
         status: SessionStatus.requestDisclosurePermission,

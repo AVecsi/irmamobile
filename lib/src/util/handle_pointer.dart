@@ -34,10 +34,12 @@ Future<void> handlePointer(NavigatorState navigator, Pointer pointer, {bool push
 
   int? sessionID;
   if (pointer is SessionPointer) {
+    debugPrint('_startSessionAndNavigate was called from here\n\n\n');
     sessionID = await _startSessionAndNavigate(navigator, pointer, pushReplacement);
   }
 
   if (pointer is IssueWizardPointer) {
+    debugPrint('_startIssueWizard was called from here\n\n\n');
     await _startIssueWizard(navigator, pointer, sessionID, pushReplacement);
   }
 }
@@ -81,6 +83,8 @@ Future<int> _startSessionAndNavigate(
     previouslyLaunchedCredentials: await repo.getPreviouslyLaunchedCredentials(),
   );
 
+  debugPrint('_startSessionAndNavigate indeed called');
+
   final hasActiveSessions = await repo.hasActiveSessions();
   final wizardActive = await repo.getIssueWizardActive().first;
   repo.dispatch(event, isBridgedEvent: true);
@@ -92,6 +96,7 @@ Future<int> _startSessionAndNavigate(
     wizardActive: wizardActive,
     wizardCred: wizardActive ? (await repo.getIssueWizard().first)?.activeItem?.credential : null,
   );
+  debugPrint('_startSessionAndNavigate continue \n${args.wizardActive}\n${args.wizardCred}\n');
 
   final routeName = () {
     switch (args.sessionType) {

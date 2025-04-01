@@ -18,16 +18,16 @@ class IrmaPreferences {
   }
 
   IrmaPreferences._(StreamingSharedPreferences preferences)
-      : _screenshotsEnabled = preferences.getBool(_screenshotsEnabledKey, defaultValue: false),
+      : _screenshotsEnabled = preferences.getBool(_screenshotsEnabledKey, defaultValue: true),
         // Please don't arbitrarily change this value, this could hinder the upgrade flow
         // For users before the pin size >5 was introduced.
         _longPin = preferences.getBool(_longPinKey, defaultValue: true),
         _reportErrors = preferences.getBool(_reportErrorsKey, defaultValue: false),
         _startQRScan = preferences.getBool(_startQRScanKey, defaultValue: false),
-        _showDisclosureDialog = preferences.getBool(_showDisclosureDialogKey, defaultValue: true),
+        _showDisclosureDialog = preferences.getBool(_showDisclosureDialogKey, defaultValue: false),
         _acceptedRootedRisk = preferences.getBool(_acceptedRootedRiskKey, defaultValue: false),
         _completedDisclosurePermissionIntro =
-            preferences.getBool(_completedDisclosurePermissionIntroKey, defaultValue: false),
+            preferences.getBool(_completedDisclosurePermissionIntroKey, defaultValue: true),
         _preferredLanguageCode = preferences.getString(_preferredLanguageKey, defaultValue: ''),
         _showNameChangedNotification = preferences.getBool(_showNameChangedNotificationKey, defaultValue: true),
         _lastSchemeUpdate = preferences.getInt(

@@ -115,9 +115,13 @@ class IrmaRepository {
       repo: this,
       sessionEventStream: _eventSubject.where((event) => event is SessionEvent).cast<SessionEvent>(),
     );
+    debugPrint('_credentialsSubject ${_credentialsSubject} \n\n\n');
     _credentialsSubject.forEach((creds) async {
+      debugPrint('_credentialsSubject creds ${creds} \n\n\n');
       final event = await _issueWizardSubject.first;
+      debugPrint('_credentialsSubject creds2 ${event.toString()} \n\n\n');
       if (event != null) {
+        debugPrint('_credentialsSubject creds3\n\n\n');
         _issueWizardSubject.add(await processIssueWizard(event.wizardData.id, event.wizardContents, creds));
       }
     });
@@ -215,6 +219,7 @@ class IrmaRepository {
     } else if (event is ClientPreferencesEvent) {
       _preferencesSubject.add(event);
     } else if (event is IssueWizardContentsEvent) {
+      debugPrint('IssueWizardContentsEvent comes from here? \n\n\n');
       _issueWizardSubject.add(await processIssueWizard(
         event.id,
         event.wizardContents,
@@ -464,6 +469,7 @@ class IrmaRepository {
     }
     final wizardData = conf.issueWizards[id]!;
     final creds = Set.from(credentials.values.map((cred) => cred.info.fullId));
+    debugPrint('IssueWizardEvent \n\n\n ${creds.contains(wizardData.issues)}, ${wizardData.issues.toString()}\n\n\n');
     return IssueWizardEvent(
       haveCredential: wizardData.issues != null && creds.contains(wizardData.issues),
       wizardData: wizardData,

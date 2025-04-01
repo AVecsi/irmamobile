@@ -12,9 +12,9 @@ import (
 	"reflect"
 	"strings"
 
+	irma "github.com/AVecsi/pq-irmago"
+	"github.com/AVecsi/pq-irmago/irmaclient"
 	"github.com/go-errors/errors"
-	irma "github.com/privacybydesign/irmago"
-	"github.com/privacybydesign/irmago/irmaclient"
 	"github.com/sirupsen/logrus"
 )
 

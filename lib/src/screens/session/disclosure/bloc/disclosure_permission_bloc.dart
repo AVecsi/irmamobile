@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -43,16 +44,24 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
   })  : _repo = repo,
         _newlyAddedCredentialHashes = [],
         super(DisclosurePermissionInitial()) {
+    repo.preferences.setCompletedDisclosurePermissionIntro(true);
+    repo.preferences.setShowDisclosureDialog(true);
     _sessionEventSubscription = repo
         .getEvents()
         .whereType<RequestIssuancePermissionSessionEvent>()
         .expand((event) => event.issuedCredentials.map((cred) => cred.hash))
         .listen(_newlyAddedCredentialHashes.add);
+
+    debugPrint(
+        'Req issue perm sess event expanded? ${repo.getEvents().whereType<RequestIssuancePermissionSessionEvent>().expand((event) => event.issuedCredentials.map((cred) => cred.hash)).toString()} \n\n\n');
+
     repo.preferences.getCompletedDisclosurePermissionIntro().first.then((introCompleted) {
       if (isClosed) return;
       if (introCompleted) {
+        debugPrint('intro was in fact completed \n\n\n');
         _listenForSessionState();
       } else {
+        debugPrint('this emits the intro \n\n\n');
         emit(DisclosurePermissionIntroduction());
       }
     });
@@ -75,6 +84,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
 
   @override
   Stream<DisclosurePermissionBlocState> mapEventToState(DisclosurePermissionBlocEvent event) async* {
+    debugPrint('mapEventToState ${this.state} \n\n\n');
     final state = this.state; // To prevent the need for type casting.
     final session = _repo.getCurrentSessionState(sessionID)!;
 
@@ -106,9 +116,13 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         final candidates = session.disclosuresCandidates!
             .asMap()
             .map((i, rawDiscon) => MapEntry(i, _parseCandidatesDisCon(rawDiscon)));
+
+        debugPrint("Candidates are: ${candidates} \n\n\n");
         // Issue wizard is completed, so all credentials in the selected cons should be choosable now.
         final choices = candidates.map((i, discon) =>
             MapEntry(i, Con(discon[_findSelectedConIndex(discon)].cast<ChoosableDisclosureCredential>())));
+
+        debugPrint("Choices are: ${choices} \n\n\n");
 
         // Wizard is completed, so now we show the previously added credentials that are involved in this session.
         // TODO: check code duplication while constructing choices overview.
@@ -173,8 +187,10 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
       final changeableChoices = <int>{};
       final choices = Map.fromEntries(session.disclosuresCandidates!.mapIndexed((i, rawDiscon) {
         final discon = _parseCandidatesDisCon(rawDiscon);
+        debugPrint("Choices are2: ${discon} \n\n\n");
         if (discon.length > 1) changeableChoices.add(i);
         final choice = _findSelectedConIndex(discon, prevChoice: state.choices[i]);
+        debugPrint("Choices are2: ${choice} \n\n\n");
         return MapEntry(i, Con(discon[choice].whereType<ChoosableDisclosureCredential>()));
       }));
       yield DisclosurePermissionChoicesOverview(
@@ -356,6 +372,8 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
   }
 
   DisclosurePermissionBlocState _mapSessionStateToBlocState(DisclosurePermissionBlocState state, SessionState session) {
+    debugPrint('_mapSessionStateToBlocState ${this.state} \n\n\n');
+    debugPrint('_mapSessionStateToBlocState session status ${session.status} \n\n\n');
     if (session.status != SessionStatus.requestDisclosurePermission) {
       if (state is! DisclosurePermissionInitial &&
           state is! DisclosurePermissionIntroduction &&
@@ -375,6 +393,9 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
       }
 
       final refreshedState = _refreshIssueWizard(issueWizardState, session);
+
+      debugPrint('_mapSessionStateToBlocState2 ${state} \n\n\n');
+      debugPrint('_mapSessionStateToBlocState2 ${refreshedState} \n\n\n');
       // currentCon cannot be null when isCompleted is false.
       return refreshedState.isCompleted
           ? refreshedState
@@ -389,6 +410,8 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         obtainCredentialsState =
             (state as DisclosurePermissionCredentialInformation).parentState as DisclosurePermissionObtainCredentials;
       }
+
+      debugPrint('_mapSessionStateToBlocState3\n\n\n');
 
       final refreshedState = _refreshObtainedCredentials(obtainCredentialsState, session);
       // In case only one credential had to be obtained, we immediately go back to the parent step.
@@ -739,6 +762,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
   }
 
   DisCon<DisclosureCredential> _parseCandidatesDisCon(DisCon<DisclosureCandidate> rawDiscon) {
+    debugPrint('_parseCandidatesDisCon ran ${rawDiscon.toString()}\n\n\n');
     // irmago makes sure that a raw discon only contains options that should be shown. Therefore,
     // we don't have to check the attributes for obtainability.
     return DisCon(rawDiscon.map((rawCon) {
@@ -755,6 +779,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
 
       return Con(groupedCon.entries.map((entry) {
         final credential = _repo.credentials[entry.value.first.credentialHash];
+        debugPrint('_parseCandidatesDisCon Con ${credential.toString()}\n\n\n');
         final attributes = entry.value
             .map((candidate) => Attribute.fromCandidate(
                   _repo.irmaConfiguration,
@@ -766,7 +791,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         // In case the credential is not present or one of the attributes is notRevokable (i.e. a revocation proof
         // was requested and none could be generated), then we generate a template credential as placeholder
         // as indication that it needs to be obtained still.
-        if (credential == null || entry.value.any((attr) => attr.notRevokable)) {
+        if (credential == null) {
           return TemplateDisclosureCredential(
             info: CredentialInfo.fromConfiguration(
               irmaConfiguration: _repo.irmaConfiguration,
@@ -780,7 +805,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
             attributes: attributes,
             previouslyAdded: !_newlyAddedCredentialHashes.contains(credential.hash),
             expired: credential.expired,
-            revoked: credential.revoked,
+            revoked: false,
             credentialHash: credential.hash,
           );
         }

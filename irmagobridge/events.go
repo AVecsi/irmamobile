@@ -3,8 +3,8 @@ package irmagobridge
 import (
 	"encoding/json"
 
-	irma "github.com/privacybydesign/irmago"
-	"github.com/privacybydesign/irmago/irmaclient"
+	irma "github.com/AVecsi/pq-irmago"
+	"github.com/AVecsi/pq-irmago/irmaclient"
 )
 
 // //
