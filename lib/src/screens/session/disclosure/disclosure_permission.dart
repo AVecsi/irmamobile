@@ -34,6 +34,7 @@ class DisclosurePermission extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('I was built here?\n\n\n\n\n\n');
     return BlocProvider(
       create: (_) => DisclosurePermissionBloc(
         sessionID: sessionId,
@@ -60,6 +61,7 @@ class ProvidedDisclosurePermission extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('I was built here2 \n\n\n\n\n\n');
     final bloc = context.read<DisclosurePermissionBloc>();
     void addEvent(DisclosurePermissionBlocEvent event) => bloc.add(event);
     void onConfirmedDismiss() => addEvent(DisclosurePermissionDismissed());
@@ -67,6 +69,7 @@ class ProvidedDisclosurePermission extends StatelessWidget {
         ? onConfirmedDismiss()
         : DisclosurePermissionCloseDialog.show(context, onConfirm: onConfirmedDismiss);
 
+    debugPrint('I was built here2 ${bloc.state} \n\n\n\n\n\n');
     // Wrapped with WillPopScope to gain control over the behavior of the "go back" gesture
     return WillPopScope(
       onWillPop: () async {
@@ -105,15 +108,18 @@ class ProvidedDisclosurePermission extends StatelessWidget {
               builder: (context, blocState) {
                 var state = blocState;
                 if (state is DisclosurePermissionWrongCredentialsObtained) {
+                  debugPrint('DisclosurePermissionWrongCredentialsObtained o-ooo \n\n\n');
                   state = state.parentState;
                 }
 
                 if (state is DisclosurePermissionIntroduction) {
+                  debugPrint('Well I guess the state is disclosurePermission intro ${state} \n\n\n');
                   return DisclosurePermissionIntroductionScreen(
                     onEvent: addEvent,
                     onDismiss: onDismiss,
                   );
                 } else if (state is DisclosurePermissionIssueWizard) {
+                  debugPrint('DisclosurePermissionIssueWizard? \n\n\n');
                   return DisclosurePermissionIssueWizardScreen(
                     requestor: requestor,
                     state: state,
@@ -121,17 +127,20 @@ class ProvidedDisclosurePermission extends StatelessWidget {
                     onDismiss: onDismiss,
                   );
                 } else if (state is DisclosurePermissionMakeChoice) {
+                  debugPrint('DisclosurePermissionMakeChoice \n\n\n');
                   return DisclosurePermissionMakeChoiceScreen(
                     state: state,
                     onEvent: addEvent,
                   );
                 } else if (state is DisclosurePermissionObtainCredentials) {
+                  debugPrint('obtain credentials... \n\n\n');
                   return DisclosurePermissionObtainCredentialsScreen(
                     state: state,
                     onEvent: addEvent,
                     onDismiss: onDismiss,
                   );
                 } else if (state is DisclosurePermissionChoices) {
+                  debugPrint('Disclosure choices \n\n\n');
                   return DisclosurePermissionChoicesScreen(
                     requestor: requestor,
                     state: state,

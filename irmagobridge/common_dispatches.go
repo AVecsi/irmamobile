@@ -3,7 +3,7 @@ package irmagobridge
 import (
 	"encoding/json"
 
-	irma "github.com/privacybydesign/irmago"
+	irma "github.com/AVecsi/pq-irmago"
 )
 
 // needed to inject logo into issuers
@@ -45,6 +45,7 @@ func dispatchConfigurationEvent() {
 }
 
 func dispatchCredentialsEvent() {
+	bridge.DebugLog("\n\n\n\n\n dispatchCredentialsEvent is coming from")
 	dispatchEvent(&credentialsEvent{
 		Credentials: client.CredentialInfoList(),
 	})

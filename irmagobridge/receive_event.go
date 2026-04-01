@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	irma "github.com/AVecsi/pq-irmago"
 	"github.com/go-errors/errors"
-	irma "github.com/privacybydesign/irmago"
 )
 
 // DispatchFromNative receives events from the Android / iOS native side

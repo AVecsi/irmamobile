@@ -9,6 +9,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.net.Uri;
 import android.content.Intent;
+import android.util.Log;
 
 import java.nio.channels.Channel;
 
@@ -55,6 +56,9 @@ public class MainActivity extends FlutterActivity {
     bridge = new IrmaMobileBridge(this, this, channel, initialURL);
     channel.setMethodCallHandler(bridge);
     initialURL = null; // Ensure we only use the initialURL once
+    System.out.println("TEST PRINT IN JAVA");
+    Log.d("MyTag", "Something from Java");
+    Irmagobridge.test();
   }
 
   // Forward new intents to the bridge

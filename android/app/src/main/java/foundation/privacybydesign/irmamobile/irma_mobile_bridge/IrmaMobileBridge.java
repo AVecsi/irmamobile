@@ -117,8 +117,19 @@ public class IrmaMobileBridge implements MethodCallHandler, irmagobridge.IrmaMob
 
   @Override
   public void debugLog(String message) {
-    if (debug)
-      System.out.printf("[IrmaMobileBridgePlugin] %s\n", message);
+    if (debug) {
+      if (message.length() > 4000) {
+        System.out.printf("[IrmaMobileBridgePlugin]\n");
+        int amountOfPrints = (message.length()/4000);
+        for (int i = 0; i <= amountOfPrints; i++) {
+          String truncated = message.substring(0, Math.min(message.length(), 4000));
+          message = message.substring(Math.min(message.length(), 4000), message.length());
+          System.out.printf("%s", truncated);
+        }
+      } else {
+        System.out.printf("[IrmaMobileBridgePlugin] %s\n", message);
+      }
+    }
   }
 
   public void stop() {

@@ -97,7 +97,7 @@ public class IrmaConfigurationCopier {
     // Because AssetManager.list is terribly slow, we'll parse the irma_configuration files
     // out of the JAR manifest manually. Strip the assets/ prefix out of the
     // manifest path and sort the list
-    private void collectConfigurationFilePaths() throws IOException {
+    /* private void collectConfigurationFilePaths() throws IOException {
         if(this.configurationFilePaths != null)
             return;
 
@@ -118,6 +118,27 @@ public class IrmaConfigurationCopier {
         }
 
         Collections.sort(this.configurationFilePaths);
+    } */
+   private void collectConfigurationFilePaths() throws IOException {
+        if(this.configurationFilePaths != null)
+            return;
+
+        this.configurationFilePaths = new ArrayList<Path>();
+        collectPathsRecursively(this.sourceConfigurationPath);
+        Collections.sort(this.configurationFilePaths);
+    }
+
+    private void collectPathsRecursively(Path path) throws IOException {
+        String[] children = this.assetManager.list(path.toString());
+        if(children == null || children.length == 0) {
+            // It's a file, add it
+            this.configurationFilePaths.add(path);
+            return;
+        }
+        // It's a directory, recurse
+        for(String child : children) {
+            collectPathsRecursively(path.resolve(child));
+        }
     }
 
     private void copyScheme(Path sourceSchemePath) throws IOException {

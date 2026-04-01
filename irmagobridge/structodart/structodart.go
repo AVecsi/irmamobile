@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/privacybydesign/gabi/big"
-	irma "github.com/privacybydesign/irmago"
-	irmaclient "github.com/privacybydesign/irmago/irmaclient"
+	"github.com/AVecsi/pq-gabi/big"
+	irma "github.com/AVecsi/pq-irmago"
+	irmaclient "github.com/AVecsi/pq-irmago/irmaclient"
 )
 
 func main() {

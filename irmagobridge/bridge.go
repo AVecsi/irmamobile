@@ -12,9 +12,9 @@ import (
 	"reflect"
 	"strings"
 
+	irma "github.com/AVecsi/pq-irmago"
+	"github.com/AVecsi/pq-irmago/irmaclient"
 	"github.com/go-errors/errors"
-	irma "github.com/privacybydesign/irmago"
-	"github.com/privacybydesign/irmago/irmaclient"
 	"github.com/sirupsen/logrus"
 )
 
@@ -55,6 +55,10 @@ type writer func(string)
 func (p writer) Write(b []byte) (int, error) {
 	p(string(b))
 	return len(b), nil
+}
+
+func Test() {
+	//irmaclient.DoTest()
 }
 
 // Start is invoked from the native side, when the app starts
