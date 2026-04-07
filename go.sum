@@ -1,7 +1,7 @@
 github.com/AVecsi/pq-gabi v0.0.0-20260401183805-78006ef5d893 h1:odVbqiYthG2WZlnFFrxJrZMOzTQhMoibHJex0ffYCSw=
 github.com/AVecsi/pq-gabi v0.0.0-20260401183805-78006ef5d893/go.mod h1:6TucOwt3o2t0KhW3N9qIAuSFTFLRZj/nWdH/ZYLashA=
-github.com/AVecsi/pq-irmago v0.0.0-20260401184756-83499534571f h1:5MqBt5VPB6gIfLinVdDg8Y8mNRUz5zEs9Houh+2Mdno=
-github.com/AVecsi/pq-irmago v0.0.0-20260401184756-83499534571f/go.mod h1:bJZVB4cgJXKSk6Im1K7ZtNkIGMVbBgYWrY3GuMLVEzY=
+github.com/AVecsi/pq-irmago v0.0.0-20260404132752-d80ad23eb921 h1:TZGizWBV/CXNx71lv7TxpXURLZyu9lthC2bdnl2SXyM=
+github.com/AVecsi/pq-irmago v0.0.0-20260404132752-d80ad23eb921/go.mod h1:aC94njyIQhbKaj/tKCaZSYrSjSnrMCm0QrSnUbMyy+8=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/alvaroloes/enumer v1.1.2/go.mod h1:FxrjvuXoDAx9isTJrv4c+T410zFi0DtXIT0m65DJ+Wo=
@@ -130,8 +130,8 @@ github.com/templexxx/cpu v0.1.1/go.mod h1:w7Tb+7qgcAlIyX4NhLuDKt78AHA5SzPmq0Wj6H
 github.com/templexxx/cpufeat v0.0.0-20180724012125-cef66df7f161/go.mod h1:wM7WEvslTq+iOEAMDLSzhVuOt5BRZ05WirO+b09GHQU=
 github.com/templexxx/xor v0.0.0-20191217153810-f85b25db303b/go.mod h1:5XA7W9S6mni3h5uvOC75dA3m9CCCaS83lltmc0ukdi4=
 github.com/templexxx/xorsimd v0.4.1/go.mod h1:W+ffZz8jJMH2SXwuKu9WhygqBMbFnp14G2fqEr8qaNo=
-github.com/templexxx/xorsimd v0.4.3 h1:9AQTFHd7Bhk3dIT7Al2XeBX5DWOvsUPZCuhyAtNbHjU=
-github.com/templexxx/xorsimd v0.4.3/go.mod h1:oZQcD6RFDisW2Am58dSAGwwL6rHjbzrlu25VDqfWkQg=
+github.com/templexxx/xorsimd v0.4.4 h1:vT7cBwIhJxitPSbJk+LIqOht2JIJOl/77cRxcyRNBFA=
+github.com/templexxx/xorsimd v0.4.4/go.mod h1:oZQcD6RFDisW2Am58dSAGwwL6rHjbzrlu25VDqfWkQg=
 github.com/timshannon/bolthold v0.0.0-20210913165410-232392fc8a6a/go.mod h1:iSvujNDmpZ6eQX+bg/0X3lF7LEmZ8N77g2a/J/+Zt2U=
 github.com/timshannon/bolthold v0.0.0-20240314194003-30aac6950928 h1:zjNCuOOhh1TKRU0Ru3PPPJt80z7eReswCao91gBLk00=
 github.com/timshannon/bolthold v0.0.0-20240314194003-30aac6950928/go.mod h1:PCFYfAEfKT+Nd6zWvUpsXduMR1bXFLf0uGSlEF05MCI=

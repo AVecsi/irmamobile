@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/AVecsi/pq-gabi v0.0.0-20260401183805-78006ef5d893
-	github.com/AVecsi/pq-irmago v0.0.0-20260401184756-83499534571f
+	github.com/AVecsi/pq-irmago v0.0.0-20260404132752-d80ad23eb921
 	github.com/go-errors/errors v1.5.1
 	github.com/sirupsen/logrus v1.9.4
 	golang.org/x/mobile v0.0.0-20250106192035-c31d5b91ecc3
@@ -37,7 +37,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sietseringers/go-sse v0.0.0-20200801161811-e2cf2c63ca50 // indirect
 	github.com/templexxx/cpu v0.1.1 // indirect
-	github.com/templexxx/xorsimd v0.4.3 // indirect
+	github.com/templexxx/xorsimd v0.4.4 // indirect
 	github.com/timshannon/bolthold v0.0.0-20240314194003-30aac6950928 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
