@@ -3,8 +3,8 @@ module github.com/privacybydesign/irmamobile
 go 1.25.0
 
 require (
-	github.com/AVecsi/pq-gabi v0.0.0-20260401183805-78006ef5d893
-	github.com/AVecsi/pq-irmago v0.0.0-20260404132752-d80ad23eb921
+	github.com/AVecsi/pq-gabi v0.0.0-20260411134200-b0046da4f92a
+	github.com/AVecsi/pq-irmago v0.0.0-20260413083239-a78662b8c695
 	github.com/go-errors/errors v1.5.1
 	github.com/sirupsen/logrus v1.9.4
 	golang.org/x/mobile v0.0.0-20250106192035-c31d5b91ecc3
@@ -29,7 +29,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-isatty v0.0.21 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
@@ -43,13 +43,13 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go.etcd.io/bbolt v1.4.3 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/crypto v0.49.0 // indirect
-	golang.org/x/mod v0.33.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/term v0.41.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
-	golang.org/x/tools v0.42.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/term v0.42.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated // indirect
 	gorm.io/gorm v1.31.1 // indirect
 )
