@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../data/irma_repository.dart';
@@ -23,29 +24,18 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   NotificationsBloc({
     required IrmaRepository repo,
   })  : _repo = repo,
-        super((NotificationsInitial()));
-
-  @override
-  Stream<NotificationsState> mapEventToState(NotificationsEvent event) async* {
+        super((NotificationsInitial())) {
     // The Initialize event should be called right after the bloc is created
     // It reads from cache, cleans up the notifications and loads new ones
-    if (event is Initialize) {
-      yield* _mapInitToState();
-    } else if (event is LoadNotifications) {
-      yield* _mapLoadNotificationsToState();
-    } else if (event is MarkAllNotificationsAsRead) {
-      yield* _mapMarkAllNotificationsAsReadToState();
-    } else if (event is MarkNotificationAsRead) {
-      yield* _mapMarkNotificationAsReadToState(event.notificationId);
-    } else if (event is SoftDeleteNotification) {
-      yield* _mapSoftDeleteNotificationToState(event.notificationId);
-    } else {
-      throw UnimplementedError();
-    }
+    on<Initialize>(_mapInitToState, transformer: sequential());
+    on<LoadNotifications>(_mapLoadNotificationsToState, transformer: sequential());
+    on<MarkAllNotificationsAsRead>(_mapMarkAllNotificationsAsReadToState, transformer: sequential());
+    on<MarkNotificationAsRead>(_mapMarkNotificationAsReadToState, transformer: sequential());
+    on<SoftDeleteNotification>(_mapSoftDeleteNotificationToState, transformer: sequential());
   }
 
-  Stream<NotificationsState> _mapInitToState() async* {
-    yield NotificationsLoading();
+  Future<void> _mapInitToState(Initialize event, Emitter<NotificationsState> emit) async {
+    emit(NotificationsLoading());
 
     List<Notification> initialNotifications = [];
 
@@ -69,11 +59,11 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     _notifications = initialNotifications;
 
     final filteredNotifications = _filterNonSoftDeletedNotifications(_notifications);
-    yield NotificationsInitialized(filteredNotifications);
+    emit(NotificationsInitialized(filteredNotifications));
   }
 
-  Stream<NotificationsState> _mapLoadNotificationsToState() async* {
-    yield NotificationsLoading();
+  Future<void> _mapLoadNotificationsToState(LoadNotifications event, Emitter<NotificationsState> emit) async {
+    emit(NotificationsLoading());
 
     List<Notification> updatedNotifications = _notifications;
 
@@ -88,11 +78,12 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     _notifications = updatedNotifications;
     final filteredNotifications = _filterNonSoftDeletedNotifications(_notifications);
 
-    yield NotificationsInitialized(filteredNotifications);
+    emit(NotificationsInitialized(filteredNotifications));
   }
 
-  Stream<NotificationsState> _mapMarkAllNotificationsAsReadToState() async* {
-    yield NotificationsLoading();
+  Future<void> _mapMarkAllNotificationsAsReadToState(
+      MarkAllNotificationsAsRead event, Emitter<NotificationsState> emit) async {
+    emit(NotificationsLoading());
 
     final List<Notification> updatedNotifications = _notifications;
 
@@ -105,15 +96,17 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     _notifications = updatedNotifications;
     final filteredNotifications = _filterNonSoftDeletedNotifications(_notifications);
 
-    yield NotificationsLoaded(filteredNotifications);
+    emit(NotificationsLoaded(filteredNotifications));
   }
 
-  Stream<NotificationsState> _mapMarkNotificationAsReadToState(String notificationId) async* {
-    yield NotificationsLoading();
+  Future<void> _mapMarkNotificationAsReadToState(
+      MarkNotificationAsRead event, Emitter<NotificationsState> emit) async {
+    emit(NotificationsLoading());
 
     final List<Notification> updatedNotifications = _notifications;
 
-    final notificationIndex = updatedNotifications.indexWhere((notification) => notification.id == notificationId);
+    final notificationIndex =
+        updatedNotifications.indexWhere((notification) => notification.id == event.notificationId);
     if (notificationIndex != -1) {
       updatedNotifications[notificationIndex].read = true;
     }
@@ -122,15 +115,17 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     _notifications = updatedNotifications;
     final filteredNotifications = _filterNonSoftDeletedNotifications(_notifications);
 
-    yield NotificationsLoaded(filteredNotifications);
+    emit(NotificationsLoaded(filteredNotifications));
   }
 
-  Stream<NotificationsState> _mapSoftDeleteNotificationToState(String notificationId) async* {
-    yield NotificationsLoading();
+  Future<void> _mapSoftDeleteNotificationToState(
+      SoftDeleteNotification event, Emitter<NotificationsState> emit) async {
+    emit(NotificationsLoading());
 
     final List<Notification> updatedNotifications = _notifications;
 
-    final notificationIndex = updatedNotifications.indexWhere((notification) => notification.id == notificationId);
+    final notificationIndex =
+        updatedNotifications.indexWhere((notification) => notification.id == event.notificationId);
     if (notificationIndex != -1) {
       updatedNotifications[notificationIndex].softDeleted = true;
     }
@@ -139,7 +134,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     _notifications = updatedNotifications;
     final filteredNotifications = _filterNonSoftDeletedNotifications(_notifications);
 
-    yield NotificationsLoaded(filteredNotifications);
+    emit(NotificationsLoaded(filteredNotifications));
   }
 
   List<Notification> _filterNonSoftDeletedNotifications(Iterable<Notification> notifications) {

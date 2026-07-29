@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:quiver/async.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -16,6 +17,7 @@ class PinBloc extends Bloc<PinEvent, PinState> {
   CountdownTimer? _pinBlockedCountdown;
 
   PinBloc() : super(PinBloc._initialState) {
+    on<PinEvent>(_onEvent, transformer: sequential());
     _lockedStreamSubscription = IrmaRepository.get().getLocked().listen((isLocked) {
       if (isLocked) {
         add(Locked());
@@ -31,50 +33,49 @@ class PinBloc extends Bloc<PinEvent, PinState> {
 
   static PinState get _initialState => PinState();
 
-  @override
-  Stream<PinState> mapEventToState(PinEvent event) async* {
+  Future<void> _onEvent(PinEvent event, Emitter<PinState> emit) async {
     if (event is Blocked) {
       setPinBlockedUntil(event.blockedUntil);
-      yield PinState(
+      emit(PinState(
         pinInvalid: true,
         blockedUntil: event.blockedUntil,
         remainingAttempts: 0,
-      );
+      ));
     } else if (event is Authenticate) {
-      yield PinState(
+      emit(PinState(
         authenticateInProgress: true,
-      );
+      ));
 
       final authenticationEvent = await event.dispatch();
       if (authenticationEvent is AuthenticationSuccessEvent) {
-        yield PinState(
+        emit(PinState(
           authenticated: true,
-        );
+        ));
       } else if (authenticationEvent is AuthenticationFailedEvent) {
         // To have some timing slack we add some time to the blocked duration.
         if (authenticationEvent.blockedDuration > 0) {
           final blockedUntil = DateTime.now().add(Duration(seconds: authenticationEvent.blockedDuration + 5));
           setPinBlockedUntil(blockedUntil);
-          yield PinState(
+          emit(PinState(
             pinInvalid: true,
             blockedUntil: blockedUntil,
             remainingAttempts: authenticationEvent.remainingAttempts,
-          );
+          ));
         } else {
-          yield PinState(
+          emit(PinState(
             pinInvalid: true,
             remainingAttempts: authenticationEvent.remainingAttempts,
-          );
+          ));
         }
       } else if (authenticationEvent is AuthenticationErrorEvent) {
-        yield PinState(
+        emit(PinState(
           error: authenticationEvent.error,
-        );
+        ));
       } else {
         throw Exception('Unexpected subtype of AuthenticationResult');
       }
     } else if (event is Locked) {
-      yield PinState();
+      emit(PinState());
     }
   }
 

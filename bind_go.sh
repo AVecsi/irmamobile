@@ -20,6 +20,7 @@ GO_DIR="$SCRIPT_DIR" # adjust if go.mod lives in a subdirectory
 # ── defaults ────────────────────────────────────────────────────────────────
 BACKEND="zkdilithium"
 TARGETS="android/arm,android/arm64"
+TARGETS_SET=0
 ANDROIDAPI=26
 OUT="$SCRIPT_DIR/android/irmagobridge/irmagobridge.aar"
 
@@ -38,7 +39,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -b | --backend) BACKEND="$2"; shift 2 ;;
-    --targets)      TARGETS="$2"; shift 2 ;;
+    --targets)      TARGETS="$2"; TARGETS_SET=1; shift 2 ;;
     --api)          ANDROIDAPI="$2"; shift 2 ;;
     -o | --out)     OUT="$2"; shift 2 ;;
     -h | --help)    usage; exit 0 ;;
@@ -73,23 +74,20 @@ prepare_zkdilithium() {
 }
 
 # ── backend: lazer (C: liblazer + Intel HEXL + GMP + MPFR) ───────────────────
-# The lazer binding links a per-ABI C static-lib stack. Unlike Rust, these are
-# not produced by `rustup`; they must be cross-compiled with the Android NDK and
-# staged under <lazer-binding>/android/<abi>/{liblazer,libhexl,libmpfr,libgmp}.a
-# (and the binding needs a matching `#cgo android,<arch> LDFLAGS:` stanza).
+# The lazer binding links a per-ABI C static-lib stack. Unlike Rust these are
+# not produced by `rustup`; the lazer repo's scripts/build-android.sh cross-
+# compiles GMP/MPFR/HEXL/liblazer with the Android NDK and stages them under
+# <lazer>/android/<abi>/lib/ (headers under .../include/). This runs it for us,
+# exactly like prepare_zkdilithium runs pq-gabi's `make build-android`.
 prepare_lazer() {
   local lazerdir; lazerdir=$(module_dir github.com/AVecsi/lazer)
-  local lazerroot; lazerroot=$(cd "$lazerdir/../.." && pwd) # golang/lazer -> repo root
-  echo "[lazer] binding at: $lazerdir"
-  echo "[lazer] lazer repo: $lazerroot"
+  echo "[lazer] lazer at: $lazerdir"
   chmod -R u+w "$lazerdir" 2>/dev/null || true
 
-  # Build the native stack if the repo provides a cross-build hook.
-  local hook="$lazerroot/scripts/build-android.sh"
-  if [[ -x "$hook" ]]; then
-    echo "[lazer] running $hook"
-    "$hook" --targets "$TARGETS" --api "$ANDROIDAPI"
-  fi
+  local hook="$lazerdir/scripts/build-android.sh"
+  [[ -x "$hook" ]] || { echo "[lazer] error: missing cross-build script $hook" >&2; exit 1; }
+  echo "[lazer] running $hook --targets $TARGETS --api $ANDROIDAPI"
+  "$hook" --targets "$TARGETS" --api "$ANDROIDAPI"
 
   # Verify the per-ABI static libs exist for every requested target.
   local missing=0 t abi lib
@@ -97,35 +95,27 @@ prepare_lazer() {
   for t in "${_targets[@]}"; do
     abi=$(abi_of "$t")
     for lib in liblazer.a libhexl.a libmpfr.a libgmp.a; do
-      if [[ ! -f "$lazerdir/android/$abi/$lib" ]]; then
-        echo "[lazer] MISSING: android/$abi/$lib" >&2
+      if [[ ! -f "$lazerdir/android/$abi/lib/$lib" ]]; then
+        echo "[lazer] MISSING: android/$abi/lib/$lib" >&2
         missing=1
       fi
     done
   done
-  if [[ $missing -ne 0 ]]; then
-    cat >&2 <<EOF
-
-[lazer] The Android C stack is not built yet. Cross-compile it for the NDK and
-stage it under: $lazerdir/android/<abi>/
-  required per ABI: liblazer.a  libhexl.a  libmpfr.a  libgmp.a
-  toolchain: \$ANDROID_NDK_HOME clang for aarch64-linux-android (+ armv7 for 32-bit)
-    GMP/MPFR : autotools ./configure --host=<abi-triple> CC=<ndk-clang>
-    HEXL     : cmake -DCMAKE_TOOLCHAIN_FILE=\$NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=<abi>
-    liblazer : make with CC=<ndk-clang> and the ARM (ARCH_ARM) path, no LaBRADOR
-The binding also needs a '#cgo android,<arch> LDFLAGS:' stanza pointing at these.
-(Drop a scripts/build-android.sh in the lazer repo to automate this; the script
-will then invoke it automatically.)
-EOF
-    exit 1
-  fi
+  [[ $missing -eq 0 ]] || { echo "[lazer] native stack incomplete; see errors above" >&2; exit 1; }
 }
 
 # ── select backend ──────────────────────────────────────────────────────────
 BUILD_TAGS=""
 case "$BACKEND" in
   zkdilithium) BUILD_TAGS="";      prepare_zkdilithium ;;
-  lazer)       BUILD_TAGS="lazer"; prepare_lazer ;;
+  lazer)
+    # lazer currently ships an arm64-only native stack; default to it unless the
+    # caller explicitly asked for specific targets.
+    if [[ $TARGETS_SET -eq 0 ]]; then
+      TARGETS="android/arm64"
+      echo "[lazer] defaulting --targets to android/arm64 (only supported ABI)"
+    fi
+    BUILD_TAGS="lazer"; prepare_lazer ;;
   *) echo "error: unknown backend '$BACKEND' (expected: zkdilithium | lazer)" >&2; exit 1 ;;
 esac
 

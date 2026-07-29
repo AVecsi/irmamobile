@@ -1,69 +1,57 @@
 import 'package:flutter/widgets.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: non_constant_identifier_names
 // ignore_for_file: constant_identifier_names
-@immutable
-class _IrmaIconsData extends IconData {
-  const _IrmaIconsData(int codePoint, this.name)
-      : super(
-          codePoint,
-          fontFamily: 'IrmaIcons',
-        );
-
-  final String name;
-}
-
 @immutable
 class IrmaIcons {
   const IrmaIcons._();
 
-  static const add = _IrmaIconsData(0xf101, 'add');
-  static const alert = _IrmaIconsData(0xf102, 'alert');
-  static const arrowBack = _IrmaIconsData(0xf103, 'arrowBack');
-  static const arrowFront = _IrmaIconsData(0xf104, 'arrowFront');
-  static const birthdate = _IrmaIconsData(0xf105, 'birthdate');
-  static const car = _IrmaIconsData(0xf106, 'car');
-  static const chevronDown = _IrmaIconsData(0xf107, 'chevronDown');
-  static const chevronLeft = _IrmaIconsData(0xf108, 'chevronLeft');
-  static const chevronRight = _IrmaIconsData(0xf109, 'chevronRight');
-  static const chevronUp = _IrmaIconsData(0xf10a, 'chevronUp');
-  static const close = _IrmaIconsData(0xf10b, 'close');
-  static const delete = _IrmaIconsData(0xf10c, 'delete');
-  static const duration = _IrmaIconsData(0xf10d, 'duration');
-  static const edit = _IrmaIconsData(0xf10e, 'edit');
-  static const email = _IrmaIconsData(0xf10f, 'email');
-  static const expand = _IrmaIconsData(0xf110, 'expand');
-  static const favourite = _IrmaIconsData(0xf111, 'favourite');
-  static const filter = _IrmaIconsData(0xf112, 'filter');
-  static const flag = _IrmaIconsData(0xf113, 'flag');
-  static const github = _IrmaIconsData(0xf114, 'github');
-  static const hideStripe = _IrmaIconsData(0xf115, 'hideStripe');
-  static const hide = _IrmaIconsData(0xf116, 'hide');
-  static const horizontalNav = _IrmaIconsData(0xf117, 'horizontalNav');
-  static const info = _IrmaIconsData(0xf118, 'info');
-  static const invalid = _IrmaIconsData(0xf119, 'invalid');
-  static const lockInApp = _IrmaIconsData(0xf11a, 'lockInApp');
-  static const lock = _IrmaIconsData(0xf11b, 'lock');
-  static const logout = _IrmaIconsData(0xf11c, 'logout');
-  static const menu = _IrmaIconsData(0xf11d, 'menu');
-  static const minus = _IrmaIconsData(0xf11e, 'minus');
-  static const personal = _IrmaIconsData(0xf11f, 'personal');
-  static const phone = _IrmaIconsData(0xf120, 'phone');
-  static const question = _IrmaIconsData(0xf121, 'question');
-  static const scanQrcode = _IrmaIconsData(0xf122, 'scanQrcode');
-  static const search = _IrmaIconsData(0xf123, 'search');
-  static const settings = _IrmaIconsData(0xf124, 'settings');
-  static const shrink = _IrmaIconsData(0xf125, 'shrink');
-  static const synchronize = _IrmaIconsData(0xf126, 'synchronize');
-  static const time = _IrmaIconsData(0xf127, 'time');
-  static const twitter = _IrmaIconsData(0xf128, 'twitter');
-  static const valid = _IrmaIconsData(0xf129, 'valid');
-  static const verticalNav = _IrmaIconsData(0xf12a, 'verticalNav');
-  static const view = _IrmaIconsData(0xf12b, 'view');
-  static const warning = _IrmaIconsData(0xf12c, 'warning');
+  static const add = IconData(0xf101, fontFamily: 'IrmaIcons');
+  static const alert = IconData(0xf102, fontFamily: 'IrmaIcons');
+  static const arrowBack = IconData(0xf103, fontFamily: 'IrmaIcons');
+  static const arrowFront = IconData(0xf104, fontFamily: 'IrmaIcons');
+  static const birthdate = IconData(0xf105, fontFamily: 'IrmaIcons');
+  static const car = IconData(0xf106, fontFamily: 'IrmaIcons');
+  static const chevronDown = IconData(0xf107, fontFamily: 'IrmaIcons');
+  static const chevronLeft = IconData(0xf108, fontFamily: 'IrmaIcons');
+  static const chevronRight = IconData(0xf109, fontFamily: 'IrmaIcons');
+  static const chevronUp = IconData(0xf10a, fontFamily: 'IrmaIcons');
+  static const close = IconData(0xf10b, fontFamily: 'IrmaIcons');
+  static const delete = IconData(0xf10c, fontFamily: 'IrmaIcons');
+  static const duration = IconData(0xf10d, fontFamily: 'IrmaIcons');
+  static const edit = IconData(0xf10e, fontFamily: 'IrmaIcons');
+  static const email = IconData(0xf10f, fontFamily: 'IrmaIcons');
+  static const expand = IconData(0xf110, fontFamily: 'IrmaIcons');
+  static const favourite = IconData(0xf111, fontFamily: 'IrmaIcons');
+  static const filter = IconData(0xf112, fontFamily: 'IrmaIcons');
+  static const flag = IconData(0xf113, fontFamily: 'IrmaIcons');
+  static const github = IconData(0xf114, fontFamily: 'IrmaIcons');
+  static const hideStripe = IconData(0xf115, fontFamily: 'IrmaIcons');
+  static const hide = IconData(0xf116, fontFamily: 'IrmaIcons');
+  static const horizontalNav = IconData(0xf117, fontFamily: 'IrmaIcons');
+  static const info = IconData(0xf118, fontFamily: 'IrmaIcons');
+  static const invalid = IconData(0xf119, fontFamily: 'IrmaIcons');
+  static const lockInApp = IconData(0xf11a, fontFamily: 'IrmaIcons');
+  static const lock = IconData(0xf11b, fontFamily: 'IrmaIcons');
+  static const logout = IconData(0xf11c, fontFamily: 'IrmaIcons');
+  static const menu = IconData(0xf11d, fontFamily: 'IrmaIcons');
+  static const minus = IconData(0xf11e, fontFamily: 'IrmaIcons');
+  static const personal = IconData(0xf11f, fontFamily: 'IrmaIcons');
+  static const phone = IconData(0xf120, fontFamily: 'IrmaIcons');
+  static const question = IconData(0xf121, fontFamily: 'IrmaIcons');
+  static const scanQrcode = IconData(0xf122, fontFamily: 'IrmaIcons');
+  static const search = IconData(0xf123, fontFamily: 'IrmaIcons');
+  static const settings = IconData(0xf124, fontFamily: 'IrmaIcons');
+  static const shrink = IconData(0xf125, fontFamily: 'IrmaIcons');
+  static const synchronize = IconData(0xf126, fontFamily: 'IrmaIcons');
+  static const time = IconData(0xf127, fontFamily: 'IrmaIcons');
+  static const twitter = IconData(0xf128, fontFamily: 'IrmaIcons');
+  static const valid = IconData(0xf129, fontFamily: 'IrmaIcons');
+  static const verticalNav = IconData(0xf12a, fontFamily: 'IrmaIcons');
+  static const view = IconData(0xf12b, fontFamily: 'IrmaIcons');
+  static const warning = IconData(0xf12c, fontFamily: 'IrmaIcons');
 
-  static const all = <String, _IrmaIconsData>{
+  static const all = <String, IconData>{
     'add': add,
     'alert': alert,
     'arrowBack': arrowBack,

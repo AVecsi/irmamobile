@@ -3,7 +3,7 @@ module github.com/privacybydesign/irmamobile
 go 1.25.0
 
 require (
-	github.com/AVecsi/pq-gabi v0.0.0-20260708123916-1d4e5ecbfe21
+	github.com/AVecsi/pq-gabi v0.0.0-20260729101610-4ff2a01573ac
 	github.com/AVecsi/pq-irmago v0.0.0-20260413083239-a78662b8c695
 	github.com/go-errors/errors v1.5.1
 	github.com/sirupsen/logrus v1.9.4
@@ -59,4 +59,4 @@ replace github.com/AVecsi/pq-gabi => /Users/vecsiadam/Documents/MPI-SP/PQ-ABC/pq
 
 replace github.com/AVecsi/pq-irmago => /Users/vecsiadam/Documents/MPI-SP/PQ-ABC/pq-irmago
 
-replace github.com/AVecsi/lazer => /Users/vecsiadam/Documents/MPI-SP/lazer/golang/lazer
+replace github.com/AVecsi/lazer => /Users/vecsiadam/Documents/MPI-SP/lazer

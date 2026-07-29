@@ -93,10 +93,11 @@ class EnterPinState {
 
 class EnterPinStateBloc extends Bloc<int, EnterPinState> {
   final int maxPinSize;
-  EnterPinStateBloc(this.maxPinSize) : super(EnterPinState.empty());
+  EnterPinStateBloc(this.maxPinSize) : super(EnterPinState.empty()) {
+    on<int>(_onEvent, transformer: sequential());
+  }
 
-  @override
-  Stream<EnterPinState> mapEventToState(int event) async* {
+  void _onEvent(int event, Emitter<EnterPinState> emit) {
     Pin pin = Pin.from(state.pin);
 
     if (event >= 0 && event < 10 && state.pin.length < maxPinSize) {
@@ -105,7 +106,7 @@ class EnterPinStateBloc extends Bloc<int, EnterPinState> {
       pin.removeLast();
     }
 
-    yield EnterPinState.createFrom(pin: pin);
+    emit(EnterPinState.createFrom(pin: pin));
   }
 }
 
@@ -113,15 +114,16 @@ class EnterPinStateBloc extends Bloc<int, EnterPinState> {
 class TestEnterPinStateBloc extends Bloc<Pin, EnterPinState> {
   final int maxPinSize;
 
-  TestEnterPinStateBloc(this.maxPinSize) : super(EnterPinState.empty());
+  TestEnterPinStateBloc(this.maxPinSize) : super(EnterPinState.empty()) {
+    on<Pin>(_onEvent, transformer: sequential());
+  }
 
   @override
   void add(Pin event) {
     super.add(event.length > maxPinSize ? event.sublist(0, maxPinSize) : event);
   }
 
-  @override
-  Stream<EnterPinState> mapEventToState(Pin event) async* {
-    yield EnterPinState.createFrom(pin: event);
+  void _onEvent(Pin event, Emitter<EnterPinState> emit) {
+    emit(EnterPinState.createFrom(pin: event));
   }
 }

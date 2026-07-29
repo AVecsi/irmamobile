@@ -1,3 +1,4 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/irma_repository.dart';
@@ -18,7 +19,9 @@ class EnrollmentBloc extends Bloc<EnrollmentBlocEvent, EnrollmentState> {
   EnrollmentBloc({
     required this.language,
     required this.repo,
-  }) : super(EnrollmentIntroduction());
+  }) : super(EnrollmentIntroduction()) {
+    on<EnrollmentBlocEvent>(_onEvent, transformer: sequential());
+  }
 
   Future<EnrollmentState> _enroll() async {
     var enrollment = await repo.enroll(
@@ -38,27 +41,26 @@ class EnrollmentBloc extends Bloc<EnrollmentBlocEvent, EnrollmentState> {
     return EnrollmentCompleted();
   }
 
-  @override
-  Stream<EnrollmentState> mapEventToState(EnrollmentBlocEvent event) async* {
+  Future<void> _onEvent(EnrollmentBlocEvent event, Emitter<EnrollmentState> emit) async {
     final state = this.state; // To prevent the need for type casting.
 
     // Retry enrollment
     if (event is EnrollmentRetried) {
-      yield Enrolling();
-      yield await _enroll();
+      emit(Enrolling());
+      emit(await _enroll());
     }
     // Introduction
     else if (state is EnrollmentIntroduction) {
       if (event is EnrollmentNextPressed) {
         if (state.currentStepIndex < IntroductionScreen.introductionSteps.length - 1) {
-          yield EnrollmentIntroduction(currentStepIndex: state.currentStepIndex + 1);
+          emit(EnrollmentIntroduction(currentStepIndex: state.currentStepIndex + 1));
         } else {
-          yield EnrollmentAcceptTerms();
+          emit(EnrollmentAcceptTerms());
         }
       } else if (event is EnrollmentPreviousPressed) {
-        yield EnrollmentIntroduction(
+        emit(EnrollmentIntroduction(
           currentStepIndex: state.currentStepIndex > 0 ? state.currentStepIndex - 1 : 0,
-        );
+        ));
       }
     }
     // Accept terms
@@ -67,45 +69,45 @@ class EnrollmentBloc extends Bloc<EnrollmentBlocEvent, EnrollmentState> {
         if (!state.isAccepted) {
           throw ('Continuing without accepting the terms is not possible');
         }
-        yield EnrollmentChoosePin();
+        emit(EnrollmentChoosePin());
       } else if (event is EnrollmentPreviousPressed) {
-        yield EnrollmentIntroduction(
+        emit(EnrollmentIntroduction(
           currentStepIndex: IntroductionScreen.introductionSteps.length - 1,
-        );
+        ));
       }
       // Terms are toggled
       else if (event is EnrollmentTermsUpdated) {
-        yield EnrollmentAcceptTerms(
+        emit(EnrollmentAcceptTerms(
           isAccepted: event.isAccepted,
-        );
+        ));
       }
     }
     // Choose Pin
     else if (state is EnrollmentChoosePin) {
       if (event is EnrollmentPinChosen) {
         _pin = event.pin;
-        yield EnrollmentConfirmPin();
+        emit(EnrollmentConfirmPin());
       } else if (event is EnrollmentPreviousPressed) {
-        yield EnrollmentAcceptTerms(
+        emit(EnrollmentAcceptTerms(
           isAccepted: true,
-        );
+        ));
       }
     }
     // Confirm Pin
     else if (state is EnrollmentConfirmPin) {
       if (event is EnrollmentPinMismatch) {
-        yield EnrollmentChoosePin();
+        emit(EnrollmentChoosePin());
       }
       if (event is EnrollmentPinConfirmed) {
         if (_pin == event.pin) {
-          yield EnrollmentProvideEmail();
+          emit(EnrollmentProvideEmail());
         } else {
-          yield EnrollmentConfirmPin(
+          emit(EnrollmentConfirmPin(
             confirmationFailed: true,
-          );
+          ));
         }
       } else if (event is EnrollmentPreviousPressed) {
-        yield EnrollmentChoosePin();
+        emit(EnrollmentChoosePin());
       }
     }
 
@@ -113,20 +115,20 @@ class EnrollmentBloc extends Bloc<EnrollmentBlocEvent, EnrollmentState> {
     else if (state is EnrollmentProvideEmail) {
       if (event is EnrollmentEmailProvided || event is EnrollmentEmailSkipped) {
         _email = event is EnrollmentEmailProvided ? event.email : null;
-        yield Enrolling();
-        yield await _enroll();
+        emit(Enrolling());
+        emit(await _enroll());
       }
       if (event is EnrollmentPreviousPressed) {
-        yield EnrollmentChoosePin();
+        emit(EnrollmentChoosePin());
       }
     } else if (state is EnrollmentEmailSent) {
       if (event is EnrollmentNextPressed) {
-        yield EnrollmentCompleted();
+        emit(EnrollmentCompleted());
       }
     } else if (state is EnrollmentFailed && event is EnrollmentPreviousPressed) {
-      yield EnrollmentProvideEmail(
+      emit(EnrollmentProvideEmail(
         email: _email,
-      );
+      ));
     }
   }
 }

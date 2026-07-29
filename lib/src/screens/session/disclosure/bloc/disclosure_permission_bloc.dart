@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,6 +45,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
   })  : _repo = repo,
         _newlyAddedCredentialHashes = [],
         super(DisclosurePermissionInitial()) {
+    on<DisclosurePermissionBlocEvent>(_onEvent, transformer: sequential());
     repo.preferences.setCompletedDisclosurePermissionIntro(true);
     repo.preferences.setShowDisclosureDialog(true);
     _sessionEventSubscription = repo
@@ -82,8 +84,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         .listen(emit);
   }
 
-  @override
-  Stream<DisclosurePermissionBlocState> mapEventToState(DisclosurePermissionBlocEvent event) async* {
+  Future<void> _onEvent(DisclosurePermissionBlocEvent event, Emitter<DisclosurePermissionBlocState> emit) async {
     debugPrint('mapEventToState ${this.state} \n\n\n');
     final state = this.state; // To prevent the need for type casting.
     final session = _repo.getCurrentSessionState(sessionID)!;
@@ -104,13 +105,13 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
 
       // When an option is changed, the list of previous added credentials that are involved in this session
       // may have changed too. Therefore, we have to recalculate the planned steps.
-      yield DisclosurePermissionIssueWizard(
+      emit(DisclosurePermissionIssueWizard(
         plannedSteps: _calculatePlannedSteps(state.candidates, selectedConIndices, session),
         candidates: state.candidates,
         candidatesList: state.candidatesList,
         selectedConIndices: selectedConIndices,
         obtained: state.obtained,
-      );
+      ));
     } else if (state is DisclosurePermissionIssueWizard && event is DisclosurePermissionNextPressed) {
       if (state.isCompleted) {
         final candidates = session.disclosuresCandidates!
@@ -142,7 +143,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
 
         if (prevAddedChoices.isEmpty && !hasPrevAddedAdditionalChoices) {
           // No previously added credentials are involved in this session, so we immediately continue to the overview.
-          yield DisclosurePermissionChoicesOverview(
+          emit(DisclosurePermissionChoicesOverview(
             plannedSteps: state.plannedSteps,
             requiredChoices: Map.fromEntries(
                 choices.entries.where((entry) => candidates[entry.key]!.every((con) => con.isNotEmpty))),
@@ -151,9 +152,9 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
             changeableChoices: changeableChoices,
             hasAdditionalOptionalChoices: choices.values.any((choice) => choice.isEmpty),
             signedMessage: session.isSignatureSession ?? false ? session.signedMessage : null,
-          );
+          ));
         } else {
-          yield DisclosurePermissionPreviouslyAddedCredentialsOverview(
+          emit(DisclosurePermissionPreviouslyAddedCredentialsOverview(
             plannedSteps: state.plannedSteps,
             requiredChoices: Map.fromEntries(
                 prevAddedChoices.entries.where((entry) => candidates[entry.key]!.every((con) => con.isNotEmpty))),
@@ -161,24 +162,24 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
                 .where((entry) => entry.value.isNotEmpty && candidates[entry.key]!.any((con) => con.isEmpty))),
             changeableChoices: changeableChoices,
             hasAdditionalOptionalChoices: hasPrevAddedAdditionalChoices,
-          );
+          ));
         }
       } else {
         final credentialsToObtain = state.getSelectedCon(state.currentDiscon!.key);
         if (credentialsToObtain?.every((cred) => cred.obtainable) ?? false) {
-          yield* _obtainCredentials(state, credentialsToObtain!);
+          await _obtainCredentials(emit, state, credentialsToObtain!);
         } else {
           throw Exception('Current DisCon is not fully obtainable and therefore not selectable');
         }
       }
     } else if (state is DisclosurePermissionObtainCredentials && event is DisclosurePermissionNextPressed) {
       if (state.allObtained) {
-        yield state.parentState;
+        emit(state.parentState);
       } else if (state.currentIssueWizardItem?.obtainable ?? false) {
-        yield DisclosurePermissionCredentialInformation(
+        emit(DisclosurePermissionCredentialInformation(
           parentState: state,
           credentialType: state.currentIssueWizardItem!.credentialType,
-        );
+        ));
       } else {
         throw Exception('Credential cannot be obtained');
       }
@@ -193,7 +194,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         debugPrint("Choices are2: ${choice} \n\n\n");
         return MapEntry(i, Con(discon[choice].whereType<ChoosableDisclosureCredential>()));
       }));
-      yield DisclosurePermissionChoicesOverview(
+      emit(DisclosurePermissionChoicesOverview(
         plannedSteps: state.plannedSteps,
         requiredChoices: Map.fromEntries(
             choices.entries.where((entry) => session.disclosuresCandidates![entry.key].every((con) => con.isNotEmpty))),
@@ -202,7 +203,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         changeableChoices: changeableChoices,
         hasAdditionalOptionalChoices: choices.values.any((choice) => choice.isEmpty),
         signedMessage: session.isSignatureSession ?? false ? session.signedMessage : null,
-      );
+      ));
     } else if (state is DisclosurePermissionPreviouslyAddedCredentialsOverview &&
         event is DisclosurePermissionChangeChoicePressed) {
       if (!state.choices.containsKey(event.disconIndex)) {
@@ -223,94 +224,94 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
             Con(con.where((cred) => prevAddedCredTypeIds.contains(cred.fullId)))
       ];
 
-      yield DisclosurePermissionChangeChoice(
+      emit(DisclosurePermissionChangeChoice(
         parentState: state,
         discon: DisCon(prevAddedDiscon),
         disconIndex: event.disconIndex,
         selectedConIndex: _findSelectedConIndex(discon, prevChoice: state.choices[event.disconIndex]),
-      );
+      ));
     } else if (state is DisclosurePermissionChoicesOverview && event is DisclosurePermissionChangeChoicePressed) {
       if (!state.choices.containsKey(event.disconIndex)) {
         throw Exception('DisCon with index ${event.disconIndex} does not exist');
       }
       final discon = _parseCandidatesDisCon(session.disclosuresCandidates![event.disconIndex]);
-      yield DisclosurePermissionChangeChoice(
+      emit(DisclosurePermissionChangeChoice(
         parentState: state,
         discon: discon,
         disconIndex: event.disconIndex,
         selectedConIndex: _findSelectedConIndex(discon, prevChoice: state.choices[event.disconIndex]),
-      );
+      ));
     } else if (state is DisclosurePermissionChangeChoice && event is DisclosurePermissionChoiceUpdated) {
       if (!state.choosableCons.containsKey(event.conIndex) && !state.templateCons.containsKey(event.conIndex)) {
         throw Exception('Con with index ${event.conIndex} does not exist');
       }
-      yield DisclosurePermissionChangeChoice(
+      emit(DisclosurePermissionChangeChoice(
         parentState: state.parentState,
         discon: state.discon,
         disconIndex: state.disconIndex,
         selectedConIndex: event.conIndex,
-      );
+      ));
     } else if (state is DisclosurePermissionChangeChoice && event is DisclosurePermissionNextPressed) {
       if (state.selectedCon.any((cred) => cred is TemplateDisclosureCredential)) {
-        yield* _obtainCredentials(state, state.selectedCon);
+        await _obtainCredentials(emit, state, state.selectedCon);
       } else {
-        yield _refreshChoices(
+        emit(_refreshChoices(
           state.parentState,
           state.discon,
           state.disconIndex,
           session.disclosuresCandidates!.length,
           state.selectedConIndex,
-        );
+        ));
       }
     } else if (state is DisclosurePermissionMakeChoice && event is DisclosurePermissionPreviousPressed) {
-      yield state.parentState;
+      emit(state.parentState);
     } else if (state is DisclosurePermissionWrongCredentialsObtained && event is DisclosurePermissionDialogDismissed) {
-      yield state.parentState;
+      emit(state.parentState);
     } else if (state is DisclosurePermissionAddOptionalData && event is DisclosurePermissionChoiceUpdated) {
       if (event.conIndex < 0 || event.conIndex >= state.discon.length) {
         throw Exception('Con with index ${event.conIndex} does not exist');
       }
-      yield DisclosurePermissionAddOptionalData(
+      emit(DisclosurePermissionAddOptionalData(
         parentState: state.parentState,
         discon: state.discon,
         disconIndices: state.disconIndices,
         selectedConIndex: event.conIndex,
-      );
+      ));
     } else if (state is DisclosurePermissionAddOptionalData && event is DisclosurePermissionNextPressed) {
       if (state.isSelectedChoosable) {
-        yield _refreshChoices(
+        emit(_refreshChoices(
           state.parentState,
           [state.selectedCon],
           state.disconIndexSelectedCon,
           session.disclosuresCandidates!.length,
           0,
-        );
+        ));
       } else {
-        yield* _obtainCredentials(state, state.selectedCon);
+        await _obtainCredentials(emit, state, state.selectedCon);
       }
     } else if (state is DisclosurePermissionChoices && event is DisclosurePermissionAddOptionalDataPressed) {
-      yield _generateAddOptionalDataState(
+      emit(_generateAddOptionalDataState(
         session: session,
         parentState: state,
         alreadyAddedOptionalDisconIndices: state.optionalChoices.keys,
-      );
+      ));
     } else if (state is DisclosurePermissionChoices && event is DisclosurePermissionRemoveOptionalDataPressed) {
       if (!state.optionalChoices.containsKey(event.disconIndex)) {
         throw Exception('Optional choice with index ${event.disconIndex} does not exist');
       }
-      yield _refreshChoices(
+      emit(_refreshChoices(
         state,
         [state.optionalChoices[event.disconIndex]!],
         event.disconIndex,
         session.disclosuresCandidates!.length,
         null,
-      );
+      ));
     } else if (state is DisclosurePermissionChoicesOverview && event is DisclosurePermissionNextPressed) {
       if (!state.choicesValid) {
         throw Exception('Selected choices are not valid');
       }
       if (!state.showConfirmationPopup) {
-        yield DisclosurePermissionChoicesOverview(
+        emit(DisclosurePermissionChoicesOverview(
           plannedSteps: state.plannedSteps,
           requiredChoices: state.requiredChoices,
           optionalChoices: state.optionalChoices,
@@ -318,7 +319,7 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
           hasAdditionalOptionalChoices: state.hasAdditionalOptionalChoices,
           signedMessage: state.signedMessage,
           showConfirmationPopup: true,
-        );
+        ));
       } else {
         // Disclosure permission is finished. We have to dispatch the choices to the IrmaRepository.
         final disclosureChoices = [
@@ -343,20 +344,20 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
         }
       }
     } else if (state is DisclosurePermissionChoicesOverview && event is DisclosurePermissionDialogDismissed) {
-      yield DisclosurePermissionChoicesOverview(
+      emit(DisclosurePermissionChoicesOverview(
         plannedSteps: state.plannedSteps,
         requiredChoices: state.requiredChoices,
         optionalChoices: state.optionalChoices,
         changeableChoices: state.changeableChoices,
         hasAdditionalOptionalChoices: state.hasAdditionalOptionalChoices,
         signedMessage: state.signedMessage,
-      );
+      ));
     } else if (state is DisclosurePermissionCredentialInformation && event is DisclosurePermissionNextPressed) {
       onObtainCredential(state.credentialType);
     } else if (state is DisclosurePermissionCredentialInformation && event is DisclosurePermissionPreviousPressed) {
-      yield state.parentState;
+      emit(state.parentState);
     } else if (event is DisclosurePermissionDismissed) {
-      yield DisclosurePermissionFinished();
+      emit(DisclosurePermissionFinished());
       _repo.dispatch(
         RespondPermissionEvent(
           sessionID: sessionID,
@@ -912,27 +913,28 @@ class DisclosurePermissionBloc extends Bloc<DisclosurePermissionBlocEvent, Discl
     );
   }
 
-  Stream<DisclosurePermissionBlocState> _obtainCredentials(
+  Future<void> _obtainCredentials(
+    Emitter<DisclosurePermissionBlocState> emit,
     DisclosurePermissionBlocState parentState,
     Con<DisclosureCredential> selectedCon,
-  ) async* {
+  ) async {
     final selectedConTemplates = selectedCon.whereType<TemplateDisclosureCredential>().toList();
     assert(selectedConTemplates.isNotEmpty);
     // If only one credential is involved, we can open the issue url immediately.
     if (selectedConTemplates.length == 1) {
       if (selectedConTemplates.first.obtainable) {
-        yield DisclosurePermissionCredentialInformation(
+        emit(DisclosurePermissionCredentialInformation(
           parentState: parentState,
           credentialType: selectedConTemplates.first.credentialType,
-        );
+        ));
       } else {
         Exception('Credential cannot be obtained');
       }
     } else {
-      yield DisclosurePermissionObtainCredentials(
+      emit(DisclosurePermissionObtainCredentials(
         parentState: parentState,
         templates: selectedConTemplates,
-      );
+      ));
     }
   }
 }
