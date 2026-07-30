@@ -3,15 +3,15 @@ module github.com/privacybydesign/irmamobile
 go 1.25.0
 
 require (
-	github.com/AVecsi/pq-gabi v0.0.0-20260729101610-4ff2a01573ac
-	github.com/AVecsi/pq-irmago v0.0.0-20260413083239-a78662b8c695
+	github.com/AVecsi/pq-gabi v0.0.0-20260729131158-f737a6a676e7
+	github.com/AVecsi/pq-irmago v0.0.0-20260729140329-9570b87da70d
 	github.com/go-errors/errors v1.5.1
 	github.com/sirupsen/logrus v1.9.4
 	golang.org/x/mobile v0.0.0-20250106192035-c31d5b91ecc3
 )
 
 require (
-	github.com/AVecsi/lazer v0.0.0 // indirect
+	github.com/AVecsi/lazer v0.0.0-20260729130749-c88d08fc64c4 // indirect
 	github.com/bwesterb/byteswriter v1.0.0 // indirect
 	github.com/bwesterb/go-atum v1.1.5 // indirect
 	github.com/bwesterb/go-pow v1.0.0 // indirect
@@ -54,9 +54,3 @@ require (
 	golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated // indirect
 	gorm.io/gorm v1.31.2 // indirect
 )
-
-replace github.com/AVecsi/pq-gabi => /Users/vecsiadam/Documents/MPI-SP/PQ-ABC/pq-gabi
-
-replace github.com/AVecsi/pq-irmago => /Users/vecsiadam/Documents/MPI-SP/PQ-ABC/pq-irmago
-
-replace github.com/AVecsi/lazer => /Users/vecsiadam/Documents/MPI-SP/lazer

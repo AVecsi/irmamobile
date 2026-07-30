@@ -1,3 +1,9 @@
+github.com/AVecsi/lazer v0.0.0-20260729130749-c88d08fc64c4 h1:Ynfo/k6BrC7a4UsgJBHQoKyLZYx5ESwKuO5cs7XtOi0=
+github.com/AVecsi/lazer v0.0.0-20260729130749-c88d08fc64c4/go.mod h1:1OxsMlXbWhChvJaw73aeJZEX6p4RLlrb+StUzhO/54Y=
+github.com/AVecsi/pq-gabi v0.0.0-20260729131158-f737a6a676e7 h1:FKHa8BZUSRJAdlAHChW/KsTDqHDIlK+kOYOy7rbWlYQ=
+github.com/AVecsi/pq-gabi v0.0.0-20260729131158-f737a6a676e7/go.mod h1:wufBTv+EsVOYM3FqOrPsJMI+mAgpNwlKylY4KolXPL0=
+github.com/AVecsi/pq-irmago v0.0.0-20260729140329-9570b87da70d h1:rdfBaany03rPEwe5aYwWMM4qSp9Aj3qNS/F0E1RltKU=
+github.com/AVecsi/pq-irmago v0.0.0-20260729140329-9570b87da70d/go.mod h1:auq9f213t8wTY8/ML5dhL6PBpDDNH7N63C2ZZCod/ps=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/alvaroloes/enumer v1.1.2/go.mod h1:FxrjvuXoDAx9isTJrv4c+T410zFi0DtXIT0m65DJ+Wo=
